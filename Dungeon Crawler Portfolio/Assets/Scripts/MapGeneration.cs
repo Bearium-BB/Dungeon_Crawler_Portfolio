@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
+using static UnityEditor.Progress;
 
 public class MapGeneration : MonoBehaviour
 {
@@ -13,7 +15,10 @@ public class MapGeneration : MonoBehaviour
     private HashSet<Vector3Int> wallPositions = new HashSet<Vector3Int>();
     public GameObject floorPrefab;
     public GameObject wallPrefab;
+    public GameObject buildingPrefab;
     public float squareSize = 1f;
+
+    public BuildingTiles buildingTiles;
 
 
     // Start is called before the first frame update
@@ -35,6 +40,19 @@ public class MapGeneration : MonoBehaviour
         AddWallsToEmptyAdjacentPositions();
 
         InstantiateGrid();
+
+
+        //for (int i = 0; i > 20; i++)
+        //{
+            foreach (var item in buildingTiles.buildingTiles)
+            {
+                HashSet<Vector3Int> validSpawn = FindValidSpawnPosition(item.x, item.z, floorPositions);
+                Instantiate(item.building, validSpawn.ElementAt(Random.Range(0, validSpawn.Count)) + Vector3.up, Quaternion.identity);
+
+            }
+        //}
+      
+
     }
 
     private void MakeFloorPositions()
@@ -131,16 +149,13 @@ public class MapGeneration : MonoBehaviour
         foreach (Vector3Int position in floorPositions)
         {
             Vector3 spawnPosition = new Vector3(position.x * squareSize, position.y * squareSize, position.z * squareSize);
-            GameObject square = Instantiate(floorPrefab, spawnPosition, Quaternion.identity);
-            square.transform.localScale = new Vector3(squareSize, squareSize, 1f);
+            GameObject floor = Instantiate(floorPrefab, spawnPosition, Quaternion.identity);
         }
 
         foreach (Vector3Int position in wallPositions)
         {
             Vector3 spawnPosition = new Vector3(position.x * squareSize, position.y * squareSize, position.z * squareSize);
-            GameObject wall = Instantiate(wallPrefab, spawnPosition, Quaternion.identity);
-            wall.transform.localScale = new Vector3(squareSize, squareSize, 1f);
-
+            GameObject wall = Instantiate(wallPrefab, spawnPosition + new Vector3(0,1.75f,0), Quaternion.identity);
         }
 
         //foreach (Vector3Int position in floorPositions)
@@ -186,7 +201,7 @@ public class MapGeneration : MonoBehaviour
 
     private Vector3Int GetRandomDirection()
     {
-        int randomIndex = Random.Range(0, 4); // 0: Up, 1: Right, 2: Down, 3: Left
+        int randomIndex = Random.Range(0, 4); // 0: Forward, 1: Right, 2: Back, 3: Left
 
         switch (randomIndex)
         {
@@ -232,6 +247,43 @@ public class MapGeneration : MonoBehaviour
         int deltaz = vector2.z - vector1.z;
         return deltaX * deltaX + deltaz * deltaz; // Euclidean distance squared
     }
+
+
+    private HashSet<Vector3Int> FindValidSpawnPosition(int objectX, int objectZ, HashSet<Vector3Int> validPositions)
+    {
+        foreach (Vector3Int startPos in floorPositions)
+        {
+            Debug.Log("start " + startPos);
+
+            Vector3Int checkPos;
+            bool canSpawn = true;
+            for (int x = 0; x < objectX; x++)
+            {
+                for (int z = 0; z < objectZ; z++)
+                {
+                    checkPos = new Vector3Int(startPos.x + x, startPos.y, startPos.z + z);
+
+                    Debug.Log(checkPos);
+
+                    if (!floorPositions.Contains(checkPos))
+                    {
+                        Debug.Log("cant spawn");
+                        //GameObject floor = Instantiate(floorPrefab, checkPos + Vector3.up*3, Quaternion.identity);
+                        canSpawn = false;
+                        break;
+                    }
+                }
+                if (!canSpawn)
+                    break;
+            }
+            if (canSpawn)
+            {
+                validPositions.Add(startPos);
+            }
+        }
+        return validPositions;
+    }
+
 }
 
 

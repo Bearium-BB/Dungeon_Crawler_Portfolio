@@ -405,7 +405,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   floorPrefab: {fileID: 1705370421983477684, guid: 55927e33d0abde84080077f4e6b472f4, type: 3}
   wallPrefab: {fileID: 4810502583983896570, guid: 782d8b12d66fbeb4698ce29abb4d539b, type: 3}
+  buildingPrefab: {fileID: 3394342778017026292, guid: ee0537f988f79184b9a4d90bc65af6f8, type: 3}
   squareSize: 1
+  buildingTiles: {fileID: 11400000, guid: da9255948234375478bee683543195fe, type: 2}
 --- !u!1 &1992865636
 GameObject:
   m_ObjectHideFlags: 0
