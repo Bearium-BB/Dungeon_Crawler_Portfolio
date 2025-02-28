@@ -2,6 +2,7 @@ using Palmmedia.ReportGenerator.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 using static UnityEditor.Progress;
@@ -10,10 +11,13 @@ using Random = UnityEngine.Random;
 public class MapGrid : MonoBehaviour
 {
     List<GridCellList> grid = new List<GridCellList>();
-    List<GridCellList> chunkGrid = new List<GridCellList>();
+    List<Chunk> chunkGrid = new List<Chunk>();
 
     public GameObject gameObjectWall;
     public GameObject gameObjectChunk;
+
+    public GameObject gameObjectChunkWall;
+    private float deltaTime = 0.0f;
 
     void Start()
     {
@@ -25,38 +29,64 @@ public class MapGrid : MonoBehaviour
         chunkGrid = ChunkGrid();
 
         InstantiateChunkGrid();
+
     }
 
+    private void Update()
+    {
+        deltaTime += (Time.unscaledDeltaTime - deltaTime) * 0.1f; 
+        float fps = 1.0f / deltaTime;
+        Debug.Log(Mathf.Round(fps));
+        LoadChunks(gameObjectChunkWall.transform.position);
+    }
+
+    void LoadChunks(Vector3 pos)
+    {
+        List<GameObject> allVisibleCells = new List<GameObject>();
+        foreach (var chunk in chunkGrid) 
+        {
+
+            if (Vector3.Distance(pos, chunk.chunkGameObject.transform.position) < 50)
+            {
+                chunk.chunkGameObject.SetActive(true);
+            }
+            else
+            {
+                chunk.chunkGameObject.SetActive(false);
+            }
+        }
+    }
 
     void InstantiateChunkGrid()
     {
-
         for (int x = 0; x < chunkGrid.Count; x++)
         {
-
             List<GameObject> gameObjectsGridCellList = new List<GameObject>();
             List<Vector3> vector3List = new List<Vector3>();
 
-            for (int y = 0; y < chunkGrid[0].cells.Count; y++)
+            // Iterate over the cells in this chunk's cellGrid.
+            for (int y = 0; y < chunkGrid[x].cellGrid.cells.Count; y++)
             {
-
-                if (chunkGrid[x].cells[y].type == "Black")
+                if (chunkGrid[x].cellGrid.cells[y].type == "Black")
                 {
-                    gameObjectsGridCellList.Add(Instantiate(gameObjectWall, new Vector3(chunkGrid[x].cells[y].pos.x, 0, chunkGrid[x].cells[y].pos.y), Quaternion.identity));
-                    vector3List.Add(new Vector3(chunkGrid[x].cells[y].pos.x, 0, chunkGrid[x].cells[y].pos.y));
+                    Vector3 cellPos = new Vector3(chunkGrid[x].cellGrid.cells[y].pos.x, 0, chunkGrid[x].cellGrid.cells[y].pos.y);
+                    GameObject wall = Instantiate(gameObjectWall, cellPos, Quaternion.identity);
+                    gameObjectsGridCellList.Add(wall);
+                    vector3List.Add(cellPos);
                 }
             }
 
-            GameObject chunk = Instantiate(gameObjectChunk, FindCenter(vector3List), Quaternion.identity);
+            GameObject chunkObj = Instantiate(gameObjectChunk, FindCenter(vector3List), Quaternion.identity);
 
             for (int i = 0; i < gameObjectsGridCellList.Count; i++)
             {
-                gameObjectsGridCellList[i].transform.parent = chunk.transform;
+                gameObjectsGridCellList[i].transform.parent = chunkObj.transform;
             }
 
-            gameObjectsGridCellList.Clear();
-            vector3List.Clear();
-            chunk.SetActive(false);
+            chunkGrid[x].cellsGameObject = gameObjectsGridCellList;
+            chunkGrid[x].chunkGameObject = chunkObj;
+
+            chunkObj.SetActive(false);
         }
     }
 
@@ -74,10 +104,10 @@ public class MapGrid : MonoBehaviour
         return sum / positions.Count;
     }
 
-    public List<GridCellList> ChunkGrid()
+    public List<Chunk> ChunkGrid()
     {
 
-        List<GridCellList> gridCellLists = new List<GridCellList>();
+        List<Chunk> gridCellLists = new List<Chunk>();
 
         int chunkSize = 10;
         int gridWidth = grid.Count;
@@ -99,7 +129,7 @@ public class MapGrid : MonoBehaviour
 
                 if (gridCells.cells.Count > 0)
                 {
-                    gridCellLists.Add(gridCells);
+                    gridCellLists.Add(new Chunk(gridCells,null,null));
                 }
             }
         }
@@ -210,6 +240,24 @@ public class MapGrid : MonoBehaviour
     }
 }
 
+public class Chunk
+{
+    public GridCellList cellGrid = new GridCellList();
+    public List<GameObject> cellsGameObject = new List<GameObject>();
+    public GameObject chunkGameObject;
+    public Chunk(GameObject _chunkGameObject)
+    {
+        chunkGameObject = _chunkGameObject;
+    }
+    public Chunk(GridCellList _cellGrid, List<GameObject> _cellsGameObject, GameObject _chunkGameObject)
+    {
+        cellGrid = _cellGrid;
+        cellsGameObject = _cellsGameObject;
+        chunkGameObject = _chunkGameObject;
+    }
+
+}
+
 [Serializable]
 public class GridCellList
 {
@@ -220,7 +268,14 @@ public class GridCellList
 public class GridCell
 {
     public Vector2Int pos;
-    public string type; 
+    public string type;
+    public GameObject cell;
+    public GridCell(Vector2Int _pos, string _type, GameObject _cell)
+    {
+        pos = _pos;
+        type = _type;
+        cell = _cell;
+    }
 
     public GridCell(Vector2Int _pos, string _type)
     {
