@@ -1,11 +1,8 @@
-using Palmmedia.ReportGenerator.Core;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
-using static UnityEditor.Progress;
 using Random = UnityEngine.Random;
 
 public class MapGrid : MonoBehaviour
@@ -23,12 +20,23 @@ public class MapGrid : MonoBehaviour
     {
         GenerateGrid(1200);
 
-        MakeMapTexture();
+        GenerateTwoBigIslands();
 
 
         chunkGrid = ChunkGrid();
 
         InstantiateChunkGrid();
+
+
+        //for (int i = 0; i < 20; i++)
+        //{
+        //    ClearMap();
+        //    GenerateTwoBigIslands();
+        //    GenerateTexture();
+        //}
+        ClearMap();
+        GenerateTwoBigIslands();
+        GenerateTexture();
 
     }
 
@@ -39,6 +47,26 @@ public class MapGrid : MonoBehaviour
         Debug.Log(Mathf.Round(fps));
         LoadChunks(gameObjectChunkWall.transform.position);
     }
+
+    public void GenerateTwoBigIslands()
+    {
+
+        for (int i = 0; i < 20; i++)
+        {
+
+            GenerateOval(Random.Range(50, 150), Random.Range(50, 150), new Vector2Int(Random.Range(400, 800), Random.Range(200, 400)));
+
+        }
+
+        for (int i = 0; i < 20; i++)
+        {
+
+            GenerateOval(Random.Range(50, 200), Random.Range(50, 150), new Vector2Int(Random.Range(400, 800), Random.Range(800, 1000)));
+
+        }
+
+    }
+
 
     void LoadChunks(Vector3 pos)
     {
@@ -64,10 +92,9 @@ public class MapGrid : MonoBehaviour
             List<GameObject> gameObjectsGridCellList = new List<GameObject>();
             List<Vector3> vector3List = new List<Vector3>();
 
-            // Iterate over the cells in this chunk's cellGrid.
             for (int y = 0; y < chunkGrid[x].cellGrid.cells.Count; y++)
             {
-                if (chunkGrid[x].cellGrid.cells[y].type == "Black")
+                if (chunkGrid[x].cellGrid.cells[y].id == 1)
                 {
                     Vector3 cellPos = new Vector3(chunkGrid[x].cellGrid.cells[y].pos.x, 0, chunkGrid[x].cellGrid.cells[y].pos.y);
                     GameObject wall = Instantiate(gameObjectWall, cellPos, Quaternion.identity);
@@ -137,32 +164,13 @@ public class MapGrid : MonoBehaviour
         return gridCellLists;
     }
 
-    public void MakeMapTexture()
-    {
-        for (int i = 0; i < 20; i++)
-        {
-
-            GenerateOval(Random.Range(50, 150), Random.Range(50, 150), new Vector2Int(Random.Range(200, 1000), Random.Range(200, 400)));
-
-        }
-
-        for (int i = 0; i < 20; i++)
-        {
-
-            GenerateOval(Random.Range(50, 200), Random.Range(50, 150), new Vector2Int(Random.Range(200, 1000), Random.Range(700, 1000)));
-
-        }
-
-        GenerateTexture();
-    }
-
     public void ClearMap()
     {
         for (int x = 0; x < grid.Count; x++)
         {
             for (int y = 0; y < grid[0].cells.Count; y++)
             {
-                grid[x].cells[y].type = "Empty";
+                grid[x].cells[y].id = 0;
             }
         }
     }
@@ -175,7 +183,7 @@ public class MapGrid : MonoBehaviour
             GridCellList cellsList = new GridCellList();
             for (int y = 0; y < size; y++)
             {
-                cellsList.cells.Add(new GridCell(new Vector2Int(x, y), "Empty"));
+                cellsList.cells.Add(new GridCell(new Vector2Int(x, y), 0));
             }
             grid.Add(cellsList);
         }
@@ -190,7 +198,7 @@ public class MapGrid : MonoBehaviour
             for (int y = 0; y < grid[0].cells.Count; y++)
             {
 
-                if (grid[x].cells[y].type == "Black")
+                if (grid[x].cells[y].id == 1)
                 {
                     texture.SetPixel(x, y, Color.black);
                 }
@@ -233,7 +241,7 @@ public class MapGrid : MonoBehaviour
                 float ovalEquation = (nx * nx) + (ny * ny) - noiseFactor;
 
                 if (ovalEquation <= 1)
-                    grid[x].cells[y].type = "Black";
+                    grid[x].cells[y].id = 1;
             }
         }
 
@@ -268,19 +276,19 @@ public class GridCellList
 public class GridCell
 {
     public Vector2Int pos;
-    public string type;
+    public int id;
     public GameObject cell;
-    public GridCell(Vector2Int _pos, string _type, GameObject _cell)
+    public GridCell(Vector2Int _pos, int _id, GameObject _cell)
     {
         pos = _pos;
-        type = _type;
+        id = _id;
         cell = _cell;
     }
 
-    public GridCell(Vector2Int _pos, string _type)
+    public GridCell(Vector2Int _pos, int _id)
     {
         pos = _pos;
-        type = _type;
+        id = _id;
     }
 }
 
