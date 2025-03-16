@@ -1,18 +1,108 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.XR;
 
 public class PlayerMovement : MonoBehaviour
 {
     public CharacterController characterController;
+    public CharacterStats stats;
+    public PlayerInput playerInput;
+    public Camera cam;
+    public ScriptableObjectTransform pos;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private Vector3 playerVelocity;
+    private float gravityValue = -9.81f;
+    private bool groundedPlayer;
+    private CharacterControls inputActions;
+
+
+    void Awake()
+    {
+        inputActions = new CharacterControls();
+
+        inputActions.Player.Enable();
+        //inputActions.Player.Move.performed += Movement;
+        inputActions.Player.Dodge.performed += Dodge;
+
+        pos.value = transform;
+    }
+
+    //public void Movement(InputAction.CallbackContext context)
+    //{
+    //    if (context.performed)
+    //    {
+    //        Vector2 input = context.ReadValue<Vector2>();
+    //        playerVelocity += (new Vector3(input.x,0, input.y) * stats.speed);
+    //    }
+    //}
+
+    public void Dodge(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            playerVelocity += transform.forward * 10;
+            characterController.Move(playerVelocity);
+        }
+    }
+
     void Start()
     {
         
     }
 
-    // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        
+
+        Vector2 input = inputActions.Player.Move.ReadValue<Vector2>();
+        playerVelocity = new Vector3(input.x * stats.speed, playerVelocity.y, input.y * stats.speed);
+
+
+        if (!inputActions.Player.Move.inProgress)
+        {
+            //float currentVelocityX = playerVelocity.x;
+            //float currentVelocityZ = playerVelocity.z;
+            //float time = 0.1f;
+
+            //float stopVelocityX = currentVelocityX / time;
+            //float stopVelocityZ = currentVelocityZ / time;
+
+            //playerVelocity -= new Vector3(stopVelocityX, 0, stopVelocityZ) * Time.deltaTime;
+            playerVelocity = new Vector3(0, playerVelocity.y, 0);
+        }
+
+        groundedPlayer = characterController.isGrounded;
+
+        if (!groundedPlayer)
+        {
+            playerVelocity.y += gravityValue * Time.deltaTime;
+        }
+        else if (playerVelocity.y < 0)
+        {
+            playerVelocity.y = 0f;
+        }
+
+        characterController.Move(playerVelocity * Time.deltaTime);
+
+        if (playerInput.currentControlScheme != "Keyboard And Mouse")
+        {
+            if (inputActions.Player.Move.inProgress)
+            {
+                Quaternion quaternion = Quaternion.LookRotation(playerVelocity);
+                transform.rotation = new Quaternion(transform.rotation.x, quaternion.y, transform.rotation.z, quaternion.w);
+            }
+        }
+        else
+        {
+            Vector3 mousePosition = Mouse.current.position.ReadValue();
+            mousePosition.z = cam.nearClipPlane;
+
+            Ray ray = cam.ScreenPointToRay(mousePosition);
+
+            if (Physics.Raycast(ray,out RaycastHit raycastHit))
+            {
+                Quaternion quaternion = Quaternion.LookRotation(raycastHit.point - transform.position);
+                transform.rotation = new Quaternion(transform.rotation.x, quaternion.y, transform.rotation.z, quaternion.w);
+            }
+        }
     }
 }
