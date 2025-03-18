@@ -1,3 +1,4 @@
+using NUnit.Framework.Internal;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.XR;
@@ -9,33 +10,19 @@ public class PlayerMovement : MonoBehaviour
     public PlayerInput playerInput;
     public Camera cam;
     public ScriptableObjectTransform pos;
+    public ScriptableObjectCharacterControls inputActions;
 
     private Vector3 playerVelocity;
     private float gravityValue = -9.81f;
     private bool groundedPlayer;
-    private CharacterControls inputActions;
-
 
     void Awake()
     {
-        inputActions = new CharacterControls();
-
-        inputActions.Player.Enable();
-        //inputActions.Player.Move.performed += Movement;
-        inputActions.Player.Dodge.performed += Dodge;
+        inputActions.value.Player.Enable();
+        inputActions.value.Player.Dodge.performed += Dodge;
 
         pos.value = transform;
     }
-
-    //public void Movement(InputAction.CallbackContext context)
-    //{
-    //    if (context.performed)
-    //    {
-    //        Vector2 input = context.ReadValue<Vector2>();
-    //        playerVelocity += (new Vector3(input.x,0, input.y) * stats.speed);
-    //    }
-    //}
-
     public void Dodge(InputAction.CallbackContext context)
     {
         if (context.performed)
@@ -53,11 +40,11 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate()
     {
 
-        Vector2 input = inputActions.Player.Move.ReadValue<Vector2>();
+        Vector2 input = inputActions.value.Player.Move.ReadValue<Vector2>();
         playerVelocity = new Vector3(input.x * stats.speed, playerVelocity.y, input.y * stats.speed);
 
 
-        if (!inputActions.Player.Move.inProgress)
+        if (!inputActions.value.Player.Move.inProgress)
         {
             //float currentVelocityX = playerVelocity.x;
             //float currentVelocityZ = playerVelocity.z;
@@ -85,7 +72,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (playerInput.currentControlScheme != "Keyboard And Mouse")
         {
-            if (inputActions.Player.Move.inProgress)
+            if (inputActions.value.Player.Move.inProgress)
             {
                 Quaternion quaternion = Quaternion.LookRotation(playerVelocity);
                 transform.rotation = new Quaternion(transform.rotation.x, quaternion.y, transform.rotation.z, quaternion.w);

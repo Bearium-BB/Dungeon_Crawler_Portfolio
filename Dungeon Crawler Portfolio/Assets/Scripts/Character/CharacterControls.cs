@@ -233,7 +233,7 @@ public partial class @CharacterControls: IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""dce0219a-9c5f-4033-8786-bde131d98a09"",
-                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": "";Controller"",

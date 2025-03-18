@@ -240,14 +240,30 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 1955186243}
+    - target: {fileID: 2475078215936485173, guid: ceaa025aee61d754791fd4849e7d1526, type: 3}
+      propertyPath: m_DefaultControlScheme
+      value: Keyboard And Mouse
+      objectReference: {fileID: 0}
+    - target: {fileID: 2475078215936485173, guid: ceaa025aee61d754791fd4849e7d1526, type: 3}
+      propertyPath: m_NeverAutoSwitchControlSchemes
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3541289407809529572, guid: ceaa025aee61d754791fd4849e7d1526, type: 3}
       propertyPath: m_Name
       value: Character Prefab
+      objectReference: {fileID: 0}
+    - target: {fileID: 3541289407809529572, guid: ceaa025aee61d754791fd4849e7d1526, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6650480321772087454, guid: ceaa025aee61d754791fd4849e7d1526, type: 3}
       propertyPath: pos
       value: 
       objectReference: {fileID: 11400000, guid: a57933ed98f084e498ce2df3b4b93d03, type: 2}
+    - target: {fileID: 6650480321772087454, guid: ceaa025aee61d754791fd4849e7d1526, type: 3}
+      propertyPath: inputActions
+      value: 
+      objectReference: {fileID: 11400000, guid: ff29fda13572a804a9a3107df3abf0d9, type: 2}
     - target: {fileID: 6952374932935279322, guid: ceaa025aee61d754791fd4849e7d1526, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -338,6 +354,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   baseCombatAction: {fileID: 11400000, guid: e1f8949493fc7384e997b4a7b10acc81, type: 2}
+  inputActions: {fileID: 11400000, guid: ff29fda13572a804a9a3107df3abf0d9, type: 2}
 --- !u!20 &1955186243 stripped
 Camera:
   m_CorrespondingSourceObject: {fileID: 3497535911958844625, guid: ceaa025aee61d754791fd4849e7d1526, type: 3}

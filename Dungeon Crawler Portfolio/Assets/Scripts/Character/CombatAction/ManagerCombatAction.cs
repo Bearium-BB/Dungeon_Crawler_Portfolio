@@ -6,13 +6,12 @@ using UnityEngine.InputSystem;
 public class ManagerCombatAction : MonoBehaviour
 {
     public CombatActionSO baseCombatAction;
-    private CharacterControls inputActions;
+    public ScriptableObjectCharacterControls inputActions;
 
     private void Awake()
     {
-        inputActions = new CharacterControls();
-        inputActions.Player.Enable();
-        inputActions.Player.BaseAttack.performed += CastAbility;
+        inputActions.value.Player.Enable();
+        inputActions.value.Player.BaseAttack.performed += CastAbility;
 
     }
 
