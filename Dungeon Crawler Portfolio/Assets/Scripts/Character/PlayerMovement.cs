@@ -6,23 +6,15 @@ using UnityEngine.InputSystem.XR;
 public class PlayerMovement : MonoBehaviour
 {
     public CharacterController characterController;
-    public CharacterStats stats;
+    public EntityStats stats;
     public PlayerInput playerInput;
     public Camera cam;
     public ScriptableObjectTransform pos;
-    public ScriptableObjectCharacterControls inputActions;
 
     private Vector3 playerVelocity;
     private float gravityValue = -9.81f;
     private bool groundedPlayer;
 
-    void Awake()
-    {
-        inputActions.value.Player.Enable();
-        inputActions.value.Player.Dodge.performed += Dodge;
-
-        pos.value = transform;
-    }
     public void Dodge(InputAction.CallbackContext context)
     {
         if (context.performed)
@@ -39,12 +31,11 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-
-        Vector2 input = inputActions.value.Player.Move.ReadValue<Vector2>();
+        Vector2 input = playerInput.actions.FindActionMap("Player").FindAction("Move").ReadValue<Vector2>();
         playerVelocity = new Vector3(input.x * stats.speed, playerVelocity.y, input.y * stats.speed);
 
 
-        if (!inputActions.value.Player.Move.inProgress)
+        if (!playerInput.actions.FindActionMap("Player").FindAction("Move").inProgress)
         {
             //float currentVelocityX = playerVelocity.x;
             //float currentVelocityZ = playerVelocity.z;
@@ -72,7 +63,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (playerInput.currentControlScheme != "Keyboard And Mouse")
         {
-            if (inputActions.value.Player.Move.inProgress)
+            if (playerInput.actions.FindActionMap("Player").FindAction("Move").inProgress)
             {
                 Quaternion quaternion = Quaternion.LookRotation(playerVelocity);
                 transform.rotation = new Quaternion(transform.rotation.x, quaternion.y, transform.rotation.z, quaternion.w);
@@ -91,5 +82,21 @@ public class PlayerMovement : MonoBehaviour
                 transform.rotation = new Quaternion(transform.rotation.x, quaternion.y, transform.rotation.z, quaternion.w);
             }
         }
+        pos.position = transform.position;
+        pos.rotation = transform.rotation;
+    }
+
+    private void OnEnable()
+    {
+        playerInput.actions.FindActionMap("Player").Enable();
+        playerInput.actions.FindActionMap("Player").FindAction("Dodge").performed += Dodge;
+    }
+    private void OnDisable()
+    {
+        playerInput.actions.FindActionMap("Player").Disable();
+        playerInput.actions.FindActionMap("Player").FindAction("Dodge").performed -= Dodge;
     }
 }
+
+
+

@@ -9,6 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1664ffd0d893dd94d847dd1e1d0557c5, type: 3}
-  m_Name: CharacterControls
+  m_Script: {fileID: 11500000, guid: b6e31d0bcadbf0f40bf9a46054eaddb4, type: 3}
+  m_Name: SlimeEnemy
   m_EditorClassIdentifier: 
+  health: 100
+  speed: 5
+  physicalDamage: 5
+  magicDamage: 5
+  physicalResistance: 10
+  magicResistance: 10
+  physicalResistancePercentage: 0.5
+  magicResistancePercentage: 0.5

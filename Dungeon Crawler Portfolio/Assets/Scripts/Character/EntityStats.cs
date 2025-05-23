@@ -1,10 +1,10 @@
 using UnityEngine;
 
 
-[CreateAssetMenu(fileName = "Stats", menuName = "Character/Stats", order = 0)]
-public class CharacterStats : ScriptableObject
+[CreateAssetMenu(fileName = "Stats", menuName = "Entity/Stats", order = 0)]
+public class EntityStats : ScriptableObject
 {
-    //float jumpHeight = 2;
+    public float health = 100;
     public float speed = 5;
     public float physicalDamage = 5;
     public float magicDamage = 5;

@@ -9,10 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f58b2d3527d1c04ca43d08e5c089474, type: 3}
+  m_Script: {fileID: 11500000, guid: b6e31d0bcadbf0f40bf9a46054eaddb4, type: 3}
   m_Name: Stats
   m_EditorClassIdentifier: 
-  speed: 10
+  health: 100
+  speed: 5
   physicalDamage: 5
   magicDamage: 5
   physicalResistance: 5

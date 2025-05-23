@@ -8,7 +8,7 @@ public class CombatActionRangeAttack : CombatActionSO
     public GameObject projectile;
     public override void CallAction()
     {
-        Instantiate(projectile, playerPos.value.position + playerPos.value.forward, playerPos.value.rotation);
+        Instantiate(projectile, playerPos.position + playerPos.rotation * Vector3.forward, playerPos.rotation);
 
     }
 
